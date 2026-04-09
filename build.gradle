@@ -1,0 +1,62 @@
+allprojects {
+    group = 'com.onetab'
+    version = '0.1.0-phase1'
+
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+        options.release = 21
+    }
+
+    tasks.withType(Test).configureEach {
+        useJUnitPlatform()
+    }
+}
+
+project(':core') {
+    dependencies {
+        implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
+        implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+        testImplementation platform('org.junit:junit-bom:5.13.0')
+        testImplementation 'org.junit.jupiter:junit-jupiter'
+        testImplementation "com.badlogicgames.gdx:gdx:$gdxVersion"
+    }
+}
+
+project(':desktop') {
+    apply plugin: 'application'
+
+    dependencies {
+        implementation project(':core')
+        implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+        implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+        implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+    }
+
+    application {
+        mainClass = 'com.onetab.desktop.DesktopLauncher'
+    }
+
+    tasks.named('run') {
+        workingDir = rootProject.file('core/src/main/resources')
+    }
+
+    tasks.register('packageDesktop', Copy) {
+        dependsOn tasks.named('installDist')
+        from(layout.buildDirectory.dir('install/desktop'))
+        into(rootProject.layout.buildDirectory.dir('packaged/one-tab-desktop'))
+    }
+}
