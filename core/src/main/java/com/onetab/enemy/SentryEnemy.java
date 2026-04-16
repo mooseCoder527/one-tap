@@ -24,6 +24,7 @@ public final class SentryEnemy extends Enemy {
         float distance = toPlayer.len();
         if (distance > 0.001f) {
             toPlayer.scl(1f / distance);
+            faceTowards(toPlayer, delta, 420f);
         }
 
         if (strafeTimer <= 0f) {
@@ -32,14 +33,16 @@ public final class SentryEnemy extends Enemy {
         }
 
         if (distance > 6f) {
-            Vector3 next = new Vector3(position).mulAdd(toPlayer, 1.8f * delta);
+            velocity.set(toPlayer).scl(1.8f);
+            Vector3 next = new Vector3(position).mulAdd(velocity, delta);
             world.resolveEnemyMovement(this, next);
         } else if (distance < 3f) {
-            Vector3 next = new Vector3(position).mulAdd(toPlayer, -1.6f * delta);
+            velocity.set(toPlayer).scl(-1.6f);
+            Vector3 next = new Vector3(position).mulAdd(velocity, delta);
             world.resolveEnemyMovement(this, next);
         } else {
-            Vector3 strafe = new Vector3(-toPlayer.z, 0f, toPlayer.x).scl(strafeDirection * 1.5f * delta);
-            Vector3 next = new Vector3(position).add(strafe);
+            velocity.set(-toPlayer.z, 0f, toPlayer.x).scl(strafeDirection * 1.5f);
+            Vector3 next = new Vector3(position).mulAdd(velocity, delta);
             world.resolveEnemyMovement(this, next);
         }
 
