@@ -3,6 +3,7 @@ package com.onetab.enemy;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector3;
 import com.onetab.player.Player;
+import com.onetab.util.Maths;
 import com.onetab.world.GameWorld;
 
 public abstract class Enemy {
@@ -14,6 +15,8 @@ public abstract class Enemy {
     public float health;
     public boolean alive = true;
     public float flash;
+    public float facingYaw = 180f;
+    public float visualTime;
 
     protected Enemy(EnemyKind kind, Vector3 spawn, float radius, float health) {
         this.kind = kind;
@@ -39,5 +42,18 @@ public abstract class Enemy {
 
     public void tickFlash(float delta) {
         flash = Math.max(0f, flash - delta * 3f);
+        visualTime += delta;
+    }
+
+    protected void faceTowards(Vector3 targetDirection, float delta, float turnSpeedDegrees) {
+        if (targetDirection.isZero(0.0001f)) {
+            return;
+        }
+        float targetYaw = Maths.yawFromDirection(targetDirection.x, targetDirection.z);
+        facingYaw = Maths.approachAngleDeg(facingYaw, targetYaw, turnSpeedDegrees * delta);
+    }
+
+    public boolean moving() {
+        return velocity.len2() > 0.01f;
     }
 }

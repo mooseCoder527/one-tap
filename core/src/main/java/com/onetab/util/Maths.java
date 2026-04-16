@@ -15,6 +15,23 @@ public final class Maths {
         return Math.max(value - delta, target);
     }
 
+    public static float yawFromDirection(float x, float z) {
+        return MathUtils.atan2(x, -z) * MathUtils.radiansToDegrees;
+    }
+
+    public static float normalizeAngleDeg(float angle) {
+        float normalized = angle % 360f;
+        if (normalized <= -180f) normalized += 360f;
+        if (normalized > 180f) normalized -= 360f;
+        return normalized;
+    }
+
+    public static float approachAngleDeg(float current, float target, float maxDelta) {
+        float delta = normalizeAngleDeg(target - current);
+        float clamped = MathUtils.clamp(delta, -maxDelta, maxDelta);
+        return normalizeAngleDeg(current + clamped);
+    }
+
     public static Vector3 forwardFromAngles(float yawDegrees, float pitchDegrees) {
         float yawRad = yawDegrees * MathUtils.degreesToRadians;
         float pitchRad = pitchDegrees * MathUtils.degreesToRadians;

@@ -21,14 +21,18 @@ public final class RusherEnemy extends Enemy {
         float distance = toPlayer.len();
         if (distance > 0.001f) {
             toPlayer.scl(1f / distance);
+            faceTowards(toPlayer, delta, 540f);
         }
         if (distance > 1.35f) {
             velocity.set(toPlayer).scl(3.4f);
             Vector3 next = new Vector3(position).mulAdd(velocity, delta);
             world.resolveEnemyMovement(this, next);
         } else if (attackCooldown <= 0f) {
+            velocity.setZero();
             player.damage(12f);
             attackCooldown = 0.85f;
+        } else {
+            velocity.setZero();
         }
     }
 
